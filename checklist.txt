@@ -1,0 +1,42 @@
+📋 Checklist de Implementação: Rework do Chatbot
+1. 🗄️ Banco de Dados & Estrutura
+[ X ] Criar a Migration: Gerar o arquivo 2026-06-29-000001_CreateChatTables.php dentro de app/Database/Migrations/.
+
+[ X ] Rodar a Migration: Executar o comando no terminal (php spark migrate) para criar as tabelas isoladas chat_sessions e chat_messages sem afetar o esquema antigo.
+
+2. 🧱 Camada de Modelos (Models)
+[ X ] Criar ChatSessionModel.php: Criar em app/Models/ com o método getHistoricoComUltimaMensagem() para alimentar a barra lateral sem travar o front-end.
+
+[ X ] Criar ChatMessageModel.php: Criar em app/Models/ com o método getMensagensSessao(), garantindo a ordenação correta (ASC) do histórico.
+
+3. 🧠 Camada de Serviços (Services - Regras de Negócio)
+[ X ] Criar ProtocolGeneratorService.php: Criar em app/Services/ para centralizar a geração do padrão de protocolo exigido (NL-2026-XXXXX).
+
+[ X ] Criar ChatBotService.php: Criar em app/Services/ contendo a árvore de decisão mockada (Abrir MEI, Registrar CNPJ, Serviços, Humano) e a validação textual para as palavras-chave de fallback (atendente, humano, ajuda).
+
+4. 🎛️ Camada de Controle (Controller & Rotas)
+[ X ] Criar ChatController.php: Criar em app/Controllers/ com os endpoints REST assíncronos:
+
+index() (Renderização e injeção no layout base).
+
+listarSessoes()
+
+criarSessao()
+
+carregarMensagens()
+
+enviarMensagem()
+
+[ X ] Atualizar app/Config/Routes.php: Mapear os novos endpoints HTTP dentro do grupo protegido pelo filtro de autenticação ('auth').
+
+5. 🎨 Camada de Visualização (Views & Componentes)
+[ X ] Criar o Balão de Mensagem: Criar o arquivo app/Views/components/message-bubble.php (lógica reativa para balão verde escuro/verde limão e tag de protocolo).
+
+[ X ] Criar as Respostas Rápidas: Criar o arquivo app/Views/components/quick-replies.php (botões gerados dinamicamente com base no último nó do bot).
+
+[ X ] Substituir a View Principal: Reescrever app/Views/chat/index.php implementando a estrutura dividida (Split Panel), os estados condicionais vazios e o formulário de envio.
+
+6. ⚡ Camada de Front-end (Assets Estáticos)
+[ X ] Criar public/css/chatbot.css: Incluir as animações de surgimento dos balões (fadeIn) e o efeito pulsação do status online.
+
+[ X ] Criar public/js/chatbot.js: Escrever o app reativo do Alpine.js contendo as funções de controle, requisições assíncronas com o backend e a função de auto-scroll para o fundo da página (scrollToBottom).
