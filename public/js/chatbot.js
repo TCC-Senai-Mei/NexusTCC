@@ -5,12 +5,11 @@ function chatbotApp() {
         idSessaoAtiva: null,
         inputTexto: '',
         digitando: false,
-        // Alinhado exatamente ao nome da sua pasta dentro de htdocs:
-        baseUrl: '/NexusTCC/public/index.php', 
+        // Configuração segura da URL base para o ambiente do XAMPP
+        baseUrl: window.location.origin + '/NexusTCC/public/index.php', 
 
         async init() {
             await this.carregarSessoes();
-            // Abre o primeiro atendimento automaticamente se houver histórico
             if (this.sessoes.length > 0) {
                 this.selecionarSessao(this.sessoes[0].id);
             }
@@ -32,7 +31,6 @@ function chatbotApp() {
             this.mensagens = [];
             this.digitando = false;
             
-            // Zera o contador de não lidas localmente para dar fluidez visual
             const sessao = this.sessoes.find(s => s.id === id);
             if (sessao) sessao.unread = 0;
 
@@ -56,18 +54,24 @@ function chatbotApp() {
             }
         },
 
+        // ESSA FUNÇÃO PRECISA SE CHAMAR EXATAMENTE "novaSessao" PARA FAZER O BOTÃO FUNCIONAR
         async novaSessao() {
             try {
-                const response = await fetch(`${this.baseUrl}/chat/criarSessao`, { method: 'POST' });
+                const response = await fetch(`${this.baseUrl}/chat/criarSessao`, { 
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
                 if (response.ok) {
                     const data = await response.json();
                     if (data.session_id) {
                         await this.carregarSessoes();
-                        this.selecionarSessao(data.session_id);
+                        this.selecionarSessao(parseInt(data.session_id));
                     }
+                } else {
+                    console.error("Servidor respondeu com erro ao criar sessão:", response.status);
                 }
             } catch (error) {
-                console.error("Erro ao iniciar nova conversa:", error);
+                console.error("Erro na requisição de nova conversa:", error);
             }
         },
 
@@ -77,7 +81,6 @@ function chatbotApp() {
 
             this.inputTexto = '';
             
-            // Otimismo Visual: renderiza o balão do usuário na hora antes de esperar a resposta da API
             this.mensagens.push({
                 id: Date.now(),
                 sender_role: 'mei',
@@ -111,7 +114,10 @@ function chatbotApp() {
             try {
                 const response = await fetch(`${this.baseUrl}/chat/enviarMensagem`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     body: JSON.stringify(payload)
                 });
 

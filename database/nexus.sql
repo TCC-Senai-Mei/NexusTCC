@@ -136,13 +136,13 @@ INSERT INTO notifications (user_id, title, description, is_read, created_at) VAL
 -- ─────────────────────────────────────────────
 -- TABELA: conversations (histórico de chats)
 -- ─────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS conversations (
+CREATE TABLE IF NOT EXISTS chat_sessions (
     id             INT AUTO_INCREMENT PRIMARY KEY,
     user_id        INT NOT NULL,
     servidor_id    INT NULL,
     titulo         VARCHAR(200) NOT NULL DEFAULT 'Nova conversa',
     tipo           ENUM('bot','humano') DEFAULT 'bot',
-    status         ENUM('ativo','aguardando_servidor','em_atendimento','encerrado') DEFAULT 'ativo',
+    ativo         ENUM('ativo','aguardando_servidor','em_atendimento','encerrado') DEFAULT 'ativo',
     protocol_number VARCHAR(20) NULL,
     created_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at     DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -154,15 +154,15 @@ CREATE TABLE IF NOT EXISTS conversations (
 -- ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS chat_messages (
     id              INT AUTO_INCREMENT PRIMARY KEY,
-    conversation_id INT NOT NULL,
-    sender_id       INT NULL,
+    session_id INT NOT NULL,
+    remetente       INT NULL,
     sender_role     ENUM('bot','mei','servidor') DEFAULT 'bot',
-    message         TEXT NOT NULL,
+    texto         TEXT NOT NULL,
     opcoes          TEXT NULL,
     protocol_number VARCHAR(20) NULL,
     is_read         TINYINT(1) DEFAULT 0,
-    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+    timestamp      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (session_id) REFERENCES chat_sessions(id)
 ) ENGINE=InnoDB;
 
 -- Senhas em texto simples (removida criptografia bcrypt)
